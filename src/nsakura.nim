@@ -72,12 +72,21 @@ when isMainModule:
       if leaves[i].state == Falling:
         leaves[i].y += 0.25
 
+  proc drawLeaves() =
+    for leaf in leaves:
+      let ix = int(round(leaf.x))
+      let iy = int(round(leaf.y))
+      if ix >= 0 and iy >= 0 and ix < terminalWidth() and iy < terminalHeight():
+        dynamicBuffer.write(ix, iy, leaf.ch, leaf.color)
+
   while true:
     let key = getKey()
     if key in {Key.Q, Key.Escape}:
       break
 
+    updatePhysics()
     dynamicBuffer.copyFrom(staticTreeBuffer)
+    drawLeaves()
     dynamicBuffer.display()
     sleep(16)
 
