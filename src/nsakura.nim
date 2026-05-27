@@ -1,3 +1,4 @@
+import std/math
 import std/os
 
 import illwill
@@ -7,6 +8,16 @@ when isMainModule:
   hideCursor()
   var screen = newTerminalBuffer(terminalWidth(), terminalHeight())
   var staticTreeBuffer = newTerminalBuffer(terminalWidth(), terminalHeight())
+
+  proc drawBranch(x, y, length, angle: float, depth: int) =
+    if depth <= 0 or length <= 0:
+      return
+
+    let nextX = x + cos(angle) * length
+    let nextY = y - sin(angle) * length
+
+    drawBranch(nextX, nextY, length * 0.7, angle - 0.4, depth - 1)
+    drawBranch(nextX, nextY, length * 0.7, angle + 0.4, depth - 1)
 
   while true:
     let key = getKey()
