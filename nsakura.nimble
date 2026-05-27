@@ -2,7 +2,7 @@
 
 version       = "0.1.0"
 author        = "Kornel Hajto"
-description   = "procedural ASCII tree generator and particle physics engine"
+description   = "Terminal cherry blossom screensaver"
 license       = "MIT"
 srcDir        = "src"
 bin           = @["nsakura"]
