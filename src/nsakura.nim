@@ -120,8 +120,8 @@ when isMainModule:
       if ix >= 0 and iy >= 0 and ix < terminalWidth() and iy < terminalHeight():
         dynamicBuffer.write(ix, iy, leaf.ch, leaf.color)
 
-  var lastGust = epochTime()
-  var gustInterval = rand(2.0..5.0)
+  var lastGust = epochTime() - 4.0
+  var gustInterval = rand(1.2..3.0)
 
   while true:
     let key = getKey()
