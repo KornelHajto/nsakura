@@ -67,6 +67,11 @@ when isMainModule:
   randomize()
   loadTreeArt("art.txt")
 
+  proc updatePhysics() =
+    for i in 0..<leaves.len:
+      if leaves[i].state == Falling:
+        leaves[i].y += 0.25
+
   while true:
     let key = getKey()
     if key in {Key.Q, Key.Escape}:
