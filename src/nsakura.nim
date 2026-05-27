@@ -12,6 +12,7 @@ when isMainModule:
 
   proc drawBranch(x, y, length, angle: float, depth: int) =
     if depth <= 0 or length <= 0:
+      leaves.add(Leaf(x: x, y: y, state: Attached, ch: "*", color: fgMagenta))
       return
 
     let nextX = x + cos(angle) * length
