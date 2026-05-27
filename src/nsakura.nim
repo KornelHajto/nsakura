@@ -21,6 +21,7 @@ when isMainModule:
     x: float
     y: float
     dx: float
+    phase: float
     state: LeafState
     ch: string
     color: ForegroundColor
@@ -62,7 +63,7 @@ when isMainModule:
           if bx >= 0 and by >= 0 and bx < terminalWidth() and by < terminalHeight():
             staticTreeBuffer.write(bx, by, $ch)
             if float(sy) < float(artHeight) * 0.45 and rand(0.0..1.0) < 0.06:
-              leaves.add(Leaf(x: float(bx), y: float(by), state: Attached, ch: "*", color: fgMagenta))
+              leaves.add(Leaf(x: float(bx), y: float(by), dx: 0.0, phase: rand(0.0..(PI * 2)), state: Attached, ch: "*", color: fgMagenta))
         sx = int(float(sx) + stepX)
       sy = int(float(sy) + stepY)
 
@@ -73,7 +74,8 @@ when isMainModule:
     for i in 0..<leaves.len:
       if leaves[i].state == Falling:
         leaves[i].y += 0.25
-        leaves[i].x += leaves[i].dx
+        leaves[i].phase += 0.08
+        leaves[i].x += leaves[i].dx + sin(leaves[i].phase) * 0.2
 
   proc drawLeaves() =
     for leaf in leaves:
@@ -98,6 +100,7 @@ when isMainModule:
         if leaves[i].state == Attached and rand(0.0..1.0) < 0.08:
           leaves[i].state = Falling
           leaves[i].dx = rand(-0.35..0.35)
+          leaves[i].phase = rand(0.0..(PI * 2))
 
     updatePhysics()
     dynamicBuffer.copyFrom(staticTreeBuffer)
