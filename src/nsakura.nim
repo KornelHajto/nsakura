@@ -1,5 +1,6 @@
 import std/math
 import std/os
+import std/parseopt
 import std/random
 import std/strutils
 import std/times
