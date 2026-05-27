@@ -6,6 +6,7 @@ import std/strutils
 import std/times
 
 import illwill
+import art
 
 when isMainModule:
   illwillInit(fullscreen = true)
@@ -33,13 +34,18 @@ when isMainModule:
   var swayAmplitude = 0.0
 
   proc loadTreeArt(path: string) =
-    if not fileExists(path):
+    var artText = ""
+    if fileExists(path):
+      artText = readFile(path)
+    elif artData.len > 0:
+      artText = artData
+    else:
       return
 
     staticTreeBuffer.clear()
     leaves.setLen(0)
 
-    let lines = readFile(path).splitLines()
+    let lines = artText.splitLines()
     var artWidth = 0
     for line in lines:
       if line.len > artWidth:
