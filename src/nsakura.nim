@@ -38,18 +38,30 @@ when isMainModule:
         artWidth = line.len
 
     let artHeight = lines.len
-    let offsetX = max(0, (terminalWidth() - artWidth) div 2)
-    let offsetY = max(0, terminalHeight() - artHeight - 1)
+    let targetWidth = max(1, terminalWidth())
+    let targetHeight = max(1, terminalHeight() - 1)
+    let stepX = max(1.0, float(artWidth) / float(targetWidth))
+    let stepY = max(1.0, float(artHeight) / float(targetHeight))
+    let scaledWidth = int(ceil(float(artWidth) / stepX))
+    let scaledHeight = int(ceil(float(artHeight) / stepY))
+    let offsetX = max(0, (terminalWidth() - scaledWidth) div 2)
+    let offsetY = max(0, terminalHeight() - scaledHeight - 1)
 
-    for y, line in lines:
-      for x, ch in line:
+    var sy = 0
+    while sy < artHeight:
+      let line = lines[sy]
+      var sx = 0
+      while sx < line.len:
+        let ch = line[sx]
         if ch != ' ':
-          let bx = offsetX + x
-          let by = offsetY + y
+          let bx = offsetX + int(float(sx) / stepX)
+          let by = offsetY + int(float(sy) / stepY)
           if bx >= 0 and by >= 0 and bx < terminalWidth() and by < terminalHeight():
             staticTreeBuffer.write(bx, by, $ch)
-            if float(y) < float(artHeight) * 0.45 and rand(0.0..1.0) < 0.08:
+            if float(sy) < float(artHeight) * 0.45 and rand(0.0..1.0) < 0.06:
               leaves.add(Leaf(x: float(bx), y: float(by), state: Attached, ch: "*", color: fgMagenta))
+        sx = int(float(sx) + stepX)
+      sy = int(float(sy) + stepY)
 
   randomize()
   loadTreeArt("art.txt")
