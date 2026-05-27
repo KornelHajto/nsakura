@@ -46,6 +46,13 @@ when isMainModule:
     Attached,
     Falling,
     Resting
+
+  type Leaf = object
+    x: float
+    y: float
+    state: LeafState
+    ch: string
+    color: ForegroundColor
   let startX = float(terminalWidth() div 2)
   let startY = float(terminalHeight() - 2)
   drawBranch(startX, startY, float(terminalHeight()) * 0.35, PI / 2, 7)
