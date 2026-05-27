@@ -2,6 +2,7 @@ import std/math
 import std/os
 import std/random
 import std/strutils
+import std/times
 
 import illwill
 
@@ -19,6 +20,7 @@ when isMainModule:
   type Leaf = object
     x: float
     y: float
+    dx: float
     state: LeafState
     ch: string
     color: ForegroundColor
@@ -71,6 +73,7 @@ when isMainModule:
     for i in 0..<leaves.len:
       if leaves[i].state == Falling:
         leaves[i].y += 0.25
+        leaves[i].x += leaves[i].dx
 
   proc drawLeaves() =
     for leaf in leaves:
@@ -79,10 +82,22 @@ when isMainModule:
       if ix >= 0 and iy >= 0 and ix < terminalWidth() and iy < terminalHeight():
         dynamicBuffer.write(ix, iy, leaf.ch, leaf.color)
 
+  var lastGust = epochTime()
+  var gustInterval = rand(2.0..5.0)
+
   while true:
     let key = getKey()
     if key in {Key.Q, Key.Escape}:
       break
+
+    let now = epochTime()
+    if now - lastGust >= gustInterval:
+      lastGust = now
+      gustInterval = rand(2.0..5.0)
+      for i in 0..<leaves.len:
+        if leaves[i].state == Attached and rand(0.0..1.0) < 0.08:
+          leaves[i].state = Falling
+          leaves[i].dx = rand(-0.35..0.35)
 
     updatePhysics()
     dynamicBuffer.copyFrom(staticTreeBuffer)
