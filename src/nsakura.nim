@@ -31,6 +31,8 @@ when isMainModule:
   var groundY = float(terminalHeight() - 1)
   var speedFactor = 1.0
   var swayAmplitude = 0.0
+  var exportPath = "build/screenshots/frame.txt"
+  var exportRequested = false
 
   proc loadTreeArt(path: string) =
     if not fileExists(path):
@@ -89,7 +91,28 @@ when isMainModule:
         swayAmplitude = clamp(parseFloat(val), 0.0, 1.0)
       except ValueError:
         swayAmplitude = 0.0
+    if kind == cmdLongOption and key == "export":
+      if val.len > 0:
+        exportPath = val
   loadTreeArt("art.txt")
+
+  proc exportFrame(path: string, tb: TerminalBuffer) =
+    if path.len == 0:
+      return
+
+    let dir = splitFile(path).dir
+    if dir.len > 0:
+      createDir(dir)
+
+    let w = width(tb)
+    let h = height(tb)
+    var output = newStringOfCap((w + 1) * h)
+    for y in 0..<h:
+      for x in 0..<w:
+        output.add($tb[x, y].ch)
+      if y < h - 1:
+        output.add('\n')
+    writeFile(path, output)
 
   proc updatePhysics() =
     for i in 0..<leaves.len:
@@ -120,7 +143,10 @@ when isMainModule:
   while true:
     let key = getKey()
     if key in {Key.Q, Key.Escape}:
+      exportFrame(exportPath, dynamicBuffer)
       break
+    if key in {Key.S, Key.ShiftS}:
+      exportRequested = true
 
     let now = epochTime()
     if now - lastGust >= gustInterval:
@@ -136,6 +162,9 @@ when isMainModule:
     dynamicBuffer.copyFrom(staticTreeBuffer)
     drawLeaves()
     dynamicBuffer.display()
+    if exportRequested:
+      exportFrame(exportPath, dynamicBuffer)
+      exportRequested = false
     sleep(16)
 
   showCursor()
