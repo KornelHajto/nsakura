@@ -29,6 +29,7 @@ when isMainModule:
   var leaves: seq[Leaf] = @[]
   var groundY = float(terminalHeight() - 1)
   var pileHeights: seq[int] = newSeq[int](max(1, terminalWidth()))
+  var speedFactor = 1.0
 
   proc loadTreeArt(path: string) =
     if not fileExists(path):
@@ -78,12 +79,18 @@ when isMainModule:
     groundY = min(float(terminalHeight() - 1), float(lowestRow))
 
   randomize()
+  for kind, key, val in getOpt():
+    if kind == cmdLongOption and key == "speed":
+      try:
+        speedFactor = clamp(parseFloat(val), 0.1, 5.0)
+      except ValueError:
+        speedFactor = 1.0
   loadTreeArt("art.txt")
 
   proc updatePhysics() =
     for i in 0..<leaves.len:
       if leaves[i].state == Falling:
-        leaves[i].y += 0.1
+        leaves[i].y += 0.1 * speedFactor
         leaves[i].phase += 0.08
         leaves[i].x += leaves[i].dx + sin(leaves[i].phase) * 0.2
         if leaves[i].y >= groundY:
