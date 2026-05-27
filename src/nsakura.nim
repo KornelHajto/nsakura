@@ -53,6 +53,8 @@ when isMainModule:
     state: LeafState
     ch: string
     color: ForegroundColor
+
+  var leaves: seq[Leaf] = @[]
   let startX = float(terminalWidth() div 2)
   let startY = float(terminalHeight() - 2)
   drawBranch(startX, startY, float(terminalHeight()) * 0.35, PI / 2, 7)
