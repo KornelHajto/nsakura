@@ -8,7 +8,7 @@ import illwill
 when isMainModule:
   illwillInit(fullscreen = true)
   hideCursor()
-  var screen = newTerminalBuffer(terminalWidth(), terminalHeight())
+  var dynamicBuffer = newTerminalBuffer(terminalWidth(), terminalHeight())
   var staticTreeBuffer = newTerminalBuffer(terminalWidth(), terminalHeight())
 
   type LeafState = enum
@@ -72,8 +72,8 @@ when isMainModule:
     if key in {Key.Q, Key.Escape}:
       break
 
-    screen.copyFrom(staticTreeBuffer)
-    screen.display()
+    dynamicBuffer.copyFrom(staticTreeBuffer)
+    dynamicBuffer.display()
     sleep(16)
 
   showCursor()
