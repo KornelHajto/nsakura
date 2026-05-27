@@ -10,6 +10,20 @@ when isMainModule:
   var screen = newTerminalBuffer(terminalWidth(), terminalHeight())
   var staticTreeBuffer = newTerminalBuffer(terminalWidth(), terminalHeight())
 
+  type LeafState = enum
+    Attached,
+    Falling,
+    Resting
+
+  type Leaf = object
+    x: float
+    y: float
+    state: LeafState
+    ch: string
+    color: ForegroundColor
+
+  var leaves: seq[Leaf] = @[]
+
   proc drawBranch(x, y, length, angle: float, depth: int) =
     if depth <= 0 or length <= 0:
       leaves.add(Leaf(x: x, y: y, state: Attached, ch: "*", color: fgMagenta))
@@ -42,20 +56,6 @@ when isMainModule:
     drawBranch(nextX, nextY, length * lengthJitter, angle + angleJitter, depth - 1)
 
   randomize()
-
-  type LeafState = enum
-    Attached,
-    Falling,
-    Resting
-
-  type Leaf = object
-    x: float
-    y: float
-    state: LeafState
-    ch: string
-    color: ForegroundColor
-
-  var leaves: seq[Leaf] = @[]
   let startX = float(terminalWidth() div 2)
   let startY = float(terminalHeight() - 2)
   drawBranch(startX, startY, float(terminalHeight()) * 0.35, PI / 2, 7)
