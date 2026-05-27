@@ -29,8 +29,6 @@ when isMainModule:
 
   var leaves: seq[Leaf] = @[]
   var groundY = float(terminalHeight() - 1)
-  var pileHeights: seq[int] = newSeq[int](max(1, terminalWidth()))
-  let maxPileHeight = 2
   var speedFactor = 1.0
 
   proc loadTreeArt(path: string) =
@@ -39,8 +37,6 @@ when isMainModule:
 
     staticTreeBuffer.clear()
     leaves.setLen(0)
-    for i in 0..<pileHeights.len:
-      pileHeights[i] = 0
 
     let lines = readFile(path).splitLines()
     var artWidth = 0
@@ -96,10 +92,7 @@ when isMainModule:
         leaves[i].phase += 0.08
         leaves[i].x += leaves[i].dx + sin(leaves[i].phase) * 0.2
         if leaves[i].y >= groundY:
-          let ix = clamp(int(round(leaves[i].x)), 0, pileHeights.len - 1)
-          if rand(0.0..1.0) < 0.35:
-            pileHeights[ix] = min(pileHeights[ix] + 1, maxPileHeight)
-          leaves[i].y = groundY - float(pileHeights[ix])
+          leaves[i].y = groundY
           leaves[i].state = Resting
 
   proc drawLeaves() =
