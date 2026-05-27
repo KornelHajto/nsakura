@@ -41,6 +41,11 @@ when isMainModule:
     drawBranch(nextX, nextY, length * lengthJitter, angle + angleJitter, depth - 1)
 
   randomize()
+
+  type LeafState = enum
+    Attached,
+    Falling,
+    Resting
   let startX = float(terminalWidth() div 2)
   let startY = float(terminalHeight() - 2)
   drawBranch(startX, startY, float(terminalHeight()) * 0.35, PI / 2, 7)
