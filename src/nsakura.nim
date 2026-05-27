@@ -6,6 +6,7 @@ when isMainModule:
   illwillInit(fullscreen = true)
   hideCursor()
   var screen = newTerminalBuffer(terminalWidth(), terminalHeight())
+  var staticTreeBuffer = newTerminalBuffer(terminalWidth(), terminalHeight())
 
   while true:
     let key = getKey()
