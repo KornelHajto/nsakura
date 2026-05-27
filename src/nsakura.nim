@@ -1,5 +1,13 @@
-# This is just an example to get you started. A typical binary package
-# uses this file as the main entry point of the application.
+import std/os
+
+import illwill
 
 when isMainModule:
-  echo("Hello, World!")
+  illwillInit(fullscreen = true)
+  hideCursor()
+  var screen = newTerminalBuffer(terminalWidth(), terminalHeight())
+
+  while true:
+    screen.clear()
+    screen.display()
+    sleep(16)
