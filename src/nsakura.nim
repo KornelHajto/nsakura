@@ -1,6 +1,6 @@
-import std/math
 import std/os
 import std/random
+import std/strutils
 
 import illwill
 
@@ -24,41 +24,35 @@ when isMainModule:
 
   var leaves: seq[Leaf] = @[]
 
-  proc drawBranch(x, y, length, angle: float, depth: int) =
-    if depth <= 0 or length <= 0:
-      leaves.add(Leaf(x: x, y: y, state: Attached, ch: "*", color: fgMagenta))
+  proc loadTreeArt(path: string) =
+    if not fileExists(path):
       return
 
-    let nextX = x + cos(angle) * length
-    let nextY = y - sin(angle) * length
+    staticTreeBuffer.clear()
+    leaves.setLen(0)
 
-    let steps = max(1, int(length))
-    for i in 0..steps:
-      let t = float(i) / float(steps)
-      let px = x + (nextX - x) * t
-      let py = y + (nextY - y) * t
-      let ix = int(round(px))
-      let iy = int(round(py))
-      var ch = '|'
-      if abs(nextX - x) > abs(nextY - y):
-        if (nextY - y) < 0:
-          ch = '/'
-        else:
-          ch = '\\'
+    let lines = readFile(path).splitLines()
+    var artWidth = 0
+    for line in lines:
+      if line.len > artWidth:
+        artWidth = line.len
 
-      if ix >= 0 and iy >= 0 and ix < terminalWidth() and iy < terminalHeight():
-        staticTreeBuffer.write(ix, iy, $ch)
+    let artHeight = lines.len
+    let offsetX = max(0, (terminalWidth() - artWidth) div 2)
+    let offsetY = max(0, terminalHeight() - artHeight - 1)
 
-    let lengthJitter = rand(0.6..0.8)
-    let angleJitter = rand(0.25..0.6)
-
-    drawBranch(nextX, nextY, length * lengthJitter, angle - angleJitter, depth - 1)
-    drawBranch(nextX, nextY, length * lengthJitter, angle + angleJitter, depth - 1)
+    for y, line in lines:
+      for x, ch in line:
+        if ch != ' ':
+          let bx = offsetX + x
+          let by = offsetY + y
+          if bx >= 0 and by >= 0 and bx < terminalWidth() and by < terminalHeight():
+            staticTreeBuffer.write(bx, by, $ch)
+            if float(y) < float(artHeight) * 0.45 and rand(0.0..1.0) < 0.08:
+              leaves.add(Leaf(x: float(bx), y: float(by), state: Attached, ch: "*", color: fgMagenta))
 
   randomize()
-  let startX = float(terminalWidth() div 2)
-  let startY = float(terminalHeight() - 2)
-  drawBranch(startX, startY, float(terminalHeight()) * 0.35, PI / 2, 7)
+  loadTreeArt("art.txt")
 
   while true:
     let key = getKey()
