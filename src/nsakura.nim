@@ -1,3 +1,4 @@
+import std/math
 import std/os
 import std/random
 import std/strutils
