@@ -10,4 +10,4 @@ bin           = @["nsakura"]
 
 # Dependencies
 
-requires "nim >= 2.2.10"
+requires "nim >= 2.2.10", "illwill >= 0.4.1"
