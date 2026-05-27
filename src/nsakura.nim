@@ -30,6 +30,7 @@ when isMainModule:
   var leaves: seq[Leaf] = @[]
   var groundY = float(terminalHeight() - 1)
   var speedFactor = 1.0
+  var swayAmplitude = 0.0
 
   proc loadTreeArt(path: string) =
     if not fileExists(path):
@@ -83,6 +84,11 @@ when isMainModule:
         speedFactor = clamp(parseFloat(val), 0.1, 5.0)
       except ValueError:
         speedFactor = 1.0
+    if kind == cmdLongOption and key == "sway":
+      try:
+        swayAmplitude = clamp(parseFloat(val), 0.0, 1.0)
+      except ValueError:
+        swayAmplitude = 0.0
   loadTreeArt("art.txt")
 
   proc updatePhysics() =
@@ -94,10 +100,16 @@ when isMainModule:
         if leaves[i].y >= groundY:
           leaves[i].y = groundY
           leaves[i].state = Resting
+      elif leaves[i].state == Attached and swayAmplitude > 0.0:
+        leaves[i].phase += 0.02
 
   proc drawLeaves() =
     for leaf in leaves:
-      let ix = int(round(leaf.x))
+      var drawX = leaf.x
+      if leaf.state == Attached and swayAmplitude > 0.0:
+        drawX += sin(leaf.phase) * swayAmplitude
+
+      let ix = int(round(drawX))
       let iy = int(round(leaf.y))
       if ix >= 0 and iy >= 0 and ix < terminalWidth() and iy < terminalHeight():
         dynamicBuffer.write(ix, iy, leaf.ch, leaf.color)
