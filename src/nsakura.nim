@@ -1,5 +1,6 @@
 import std/math
 import std/os
+import std/random
 
 import illwill
 
@@ -33,15 +34,23 @@ when isMainModule:
       if ix >= 0 and iy >= 0 and ix < terminalWidth() and iy < terminalHeight():
         staticTreeBuffer.write(ix, iy, $ch)
 
-    drawBranch(nextX, nextY, length * 0.7, angle - 0.4, depth - 1)
-    drawBranch(nextX, nextY, length * 0.7, angle + 0.4, depth - 1)
+    let lengthJitter = rand(0.6..0.8)
+    let angleJitter = rand(0.25..0.6)
+
+    drawBranch(nextX, nextY, length * lengthJitter, angle - angleJitter, depth - 1)
+    drawBranch(nextX, nextY, length * lengthJitter, angle + angleJitter, depth - 1)
+
+  randomize()
+  let startX = float(terminalWidth() div 2)
+  let startY = float(terminalHeight() - 2)
+  drawBranch(startX, startY, float(terminalHeight()) * 0.35, PI / 2, 7)
 
   while true:
     let key = getKey()
     if key in {Key.Q, Key.Escape}:
       break
 
-    screen.clear()
+    screen.copyFrom(staticTreeBuffer)
     screen.display()
     sleep(16)
 
