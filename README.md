@@ -4,6 +4,17 @@ Terminal cherry blossom screensaver written in Nim using the illwill library.
 It draws a static ASCII tree and animates falling leaves with a lightweight
 physics loop.
 
+
+
+
+
+https://github.com/user-attachments/assets/037eda2f-fef5-406f-b034-e6d4dd09360d
+
+
+
+
+
+
 ## Features
 - Fullscreen, double-buffered rendering (no flicker)
 - ASCII tree loaded from `art.txt` and scaled to the terminal
