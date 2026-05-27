@@ -76,6 +76,8 @@ when isMainModule:
         leaves[i].y += 0.25
         leaves[i].phase += 0.08
         leaves[i].x += leaves[i].dx + sin(leaves[i].phase) * 0.2
+        if leaves[i].y >= float(terminalHeight()):
+          leaves[i].state = Resting
 
   proc drawLeaves() =
     for leaf in leaves:
