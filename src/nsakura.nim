@@ -135,6 +135,7 @@ when isMainModule:
     updatePhysics()
     dynamicBuffer.copyFrom(staticTreeBuffer)
     drawLeaves()
+    dynamicBuffer.write(1, max(0, terminalHeight() - 1), "Q/Esc to quit", fgWhite)
     dynamicBuffer.display()
     sleep(16)
 
