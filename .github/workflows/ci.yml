@@ -73,3 +73,34 @@ jobs:
           name: ${{ matrix.artifact_name }}
           path: ${{ matrix.artifact_path }}
           retention-days: 90
+
+  macos-universal:
+    name: build (macos-universal)
+    runs-on: macos-latest
+    needs: build
+    steps:
+      - name: Download arm64 artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: nsakura-macos-arm64
+          path: dist/arm64
+
+      - name: Download amd64 artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: nsakura-macos-amd64
+          path: dist/amd64
+
+      - name: Create universal binary
+        shell: bash
+        run: |
+          mkdir -p dist/universal
+          lipo -create dist/arm64/nsakura dist/amd64/nsakura -output dist/universal/nsakura
+          lipo -info dist/universal/nsakura
+
+      - name: Upload universal artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nsakura-macos-universal
+          path: dist/universal/nsakura
+          retention-days: 90
