@@ -22,6 +22,14 @@ https://github.com/user-attachments/assets/037eda2f-fef5-406f-b034-e6d4dd09360d
 - Optional sway for attached leaves
 - Adjustable speed for debugging
 
+## Installation
+
+### macOS & Linux (Homebrew)
+The easiest way to install `nsakura` on macOS or Linux is via Homebrew:
+```sh
+brew install KornelHajto/tap/nsakura
+```
+
 ## Build
 ```sh
 nimble install illwill
