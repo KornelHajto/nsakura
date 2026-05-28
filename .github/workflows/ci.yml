@@ -25,6 +25,15 @@ jobs:
               nimble install -y illwill
               mkdir -p dist
               nim c -d:release --out:dist/nsakura src/nsakura.nim
+          - os: macos-13
+            artifact_name: nsakura-macos-amd64
+            artifact_path: dist/nsakura
+            setup_nim: true
+            shell: bash
+            build_script: |
+              nimble install -y illwill
+              mkdir -p dist
+              nim c -d:release --out:dist/nsakura src/nsakura.nim
           - os: windows-latest
             artifact_name: nsakura-windows-amd64
             artifact_path: dist/nsakura.exe
