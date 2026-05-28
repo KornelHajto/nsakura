@@ -32,10 +32,11 @@ when isMainModule:
   var groundY = float(terminalHeight() - 1)
   var speedFactor = 1.0
   var swayAmplitude = 0.0
+  var artPath = ""
 
   proc loadTreeArt(path: string) =
     var artText = ""
-    if fileExists(path):
+    if path.len > 0 and fileExists(path):
       artText = readFile(path)
     elif artData.len > 0:
       artText = artData
@@ -95,7 +96,9 @@ when isMainModule:
         swayAmplitude = clamp(parseFloat(val), 0.0, 1.0)
       except ValueError:
         swayAmplitude = 0.0
-  loadTreeArt("art.txt")
+    if kind == cmdLongOption and key == "art":
+      artPath = val
+  loadTreeArt(artPath)
 
   proc updatePhysics() =
     for i in 0..<leaves.len:
