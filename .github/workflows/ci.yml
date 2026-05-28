@@ -2,6 +2,10 @@ name: ci
 
 on:
   push:
+    branches: [ "main" ]
+    tags: [ "v*.*.*" ] # Triggers the release job when you push a tag like v1.0.0
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   build:
@@ -67,3 +71,87 @@ jobs:
           name: ${{ matrix.artifact_name }}
           path: ${{ matrix.artifact_path }}
           retention-days: 90
+
+  # NEW JOB: Triggers only on tags (e.g., v1.0.0), zips artifacts, releases, and updates Homebrew
+  release:
+    name: create release & update homebrew
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Needed to create GitHub Releases automatically
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Archive artifacts (tar.gz / zip)
+        run: |
+          mkdir -p release_assets
+          
+          # Linux
+          chmod +x artifacts/nsakura-linux-amd64/nsakura
+          tar -czvf release_assets/nsakura-linux-amd64.tar.gz -C artifacts/nsakura-linux-amd64 nsakura
+          
+          # macOS
+          chmod +x artifacts/nsakura-macos-universal/nsakura
+          tar -czvf release_assets/nsakura-macos-universal.tar.gz -C artifacts/nsakura-macos-universal nsakura
+          
+          # Windows
+          cd artifacts/nsakura-windows-amd64
+          zip ../../release_assets/nsakura-windows-amd64.zip nsakura.exe
+          cd ../..
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release_assets/*
+          generate_release_notes: true
+
+      - name: Update Homebrew Tap
+        env:
+          TAP_TOKEN: ${{ secrets.TAP_TOKEN }}
+          VERSION: ${{ github.ref_name }} # e.g., v1.0.0
+        run: |
+          # Calculate SHA256 hashes
+          MAC_SHA=$(sha256sum release_assets/nsakura-macos-universal.tar.gz | awk '{print $1}')
+          LINUX_SHA=$(sha256sum release_assets/nsakura-linux-amd64.tar.gz | awk '{print $1}')
+          
+          # Strip the 'v' prefix for the Homebrew version variable
+          FORMULA_VERSION="${VERSION#v}"
+          
+          # Clone your tap repository
+          git clone https://${TAP_TOKEN}@github.com/KornelHajto/homebrew-tap.git
+          cd homebrew-tap
+          
+          # Auto-generate the formula
+          cat <<EOF > nsakura.rb
+          class Nsakura < Formula
+            desc "Terminal cherry blossom screensaver"
+            homepage "https://github.com/KornelHajto/nsakura"
+            version "${FORMULA_VERSION}"
+
+            if OS.mac?
+              url "https://github.com/KornelHajto/nsakura/releases/download/${VERSION}/nsakura-macos-universal.tar.gz"
+              sha256 "${MAC_SHA}"
+            elsif OS.linux?
+              url "https://github.com/KornelHajto/nsakura/releases/download/${VERSION}/nsakura-linux-amd64.tar.gz"
+              sha256 "${LINUX_SHA}"
+            end
+
+            def install
+              bin.install "nsakura"
+            end
+          end
+          EOF
+          
+          # Push the changes
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add nsakura.rb
+          git commit -m "Bump nsakura to ${VERSION}"
+          git push
